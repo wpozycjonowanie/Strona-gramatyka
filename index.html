@@ -2,127 +2,107 @@
 <html lang="pl">
 <head>
   <meta charset="UTF-8">
-  <title>Ściągawka - Gramatyka Polska</title>
+  <title>Prosty CRM</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f0f8ff;
-      color: #222;
-      text-align: center;
-      padding: 20px;
-    }
-    h1 {
-      color: #e60073;
-    }
-    input {
-      padding: 10px;
-      font-size: 16px;
-      width: 80%;
-      margin: 15px 0;
-      border: 2px solid #e60073;
-      border-radius: 8px;
-    }
-    .card {
-      background: #fff;
-      border-radius: 12px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-      padding: 20px;
-      margin: 15px auto;
-      width: 90%;
-      max-width: 600px;
-      text-align: left;
-    }
-    .title {
-      font-weight: bold;
-      margin-bottom: 10px;
-      color: #0073e6;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 10px;
-    }
-    td, th {
-      border: 1px solid #ddd;
-      padding: 6px;
-      text-align: center;
-    }
+    body { font-family: Arial, sans-serif; margin: 20px; background: #f7f7f7; }
+    h1 { color: #0073e6; }
+    .form, .list { background: #fff; padding: 15px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+    label { display: block; margin-top: 10px; }
+    input, select { width: 100%; padding: 8px; margin-top: 5px; border-radius: 5px; border: 1px solid #ccc; }
+    button { margin-top: 10px; padding: 10px 15px; background: #0073e6; color: white; border: none; border-radius: 5px; cursor: pointer; }
+    button:hover { background: #005bb5; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
+    th { background: #0073e6; color: white; }
+    .delete { background: red; }
   </style>
 </head>
 <body>
-  <h1>💖 Dla Nianci pięknej mojej kochanej 💖</h1>
-  <p>Wpisz słowo i sprawdź jego odmianę:</p>
-  <input type="text" id="wordInput" placeholder="np. kot, biegać, piękny" oninput="analyzeWord()">
+  <h1>💼 Prosty CRM</h1>
 
-  <div id="result"></div>
+  <div class="form">
+    <h2>Dodaj klienta</h2>
+    <label>Imię i nazwisko:
+      <input type="text" id="name">
+    </label>
+    <label>Email:
+      <input type="email" id="email">
+    </label>
+    <label>Telefon:
+      <input type="text" id="phone">
+    </label>
+    <label>Status:
+      <select id="status">
+        <option value="nowy">Nowy</option>
+        <option value="w trakcie">W trakcie</option>
+        <option value="współpracuje">Współpracuje</option>
+        <option value="tylko zapytał">Tylko zapytał</option>
+      </select>
+    </label>
+    <button onclick="addClient()">Dodaj klienta</button>
+  </div>
+
+  <div class="list">
+    <h2>Lista klientów</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Imię i nazwisko</th>
+          <th>Email</th>
+          <th>Telefon</th>
+          <th>Status</th>
+          <th>Akcje</th>
+        </tr>
+      </thead>
+      <tbody id="clientList"></tbody>
+    </table>
+  </div>
 
   <script>
-    // Prosta baza słów (na start)
-    const words = {
-      "kot": {
-        type: "rzeczownik",
-        cases: {
-          singular: ["kot", "kota", "kotu", "kota", "kotem", "kocie", "kocie"],
-          plural: ["koty", "kotów", "kotom", "koty", "kotami", "kotach", "koty"]
-        }
-      },
-      "drzewo": {
-        type: "rzeczownik",
-        cases: {
-          singular: ["drzewo", "drzewa", "drzewu", "drzewo", "drzewem", "drzewie", "drzewo"],
-          plural: ["drzewa", "drzew", "drzewom", "drzewa", "drzewami", "drzewach", "drzewa"]
-        }
-      },
-      "piękny": {
-        type: "przymiotnik",
-        cases: {
-          singular: ["piękny", "pięknego", "pięknemu", "pięknego", "pięknym", "pięknym", "piękny"],
-          plural: ["piękni", "pięknych", "pięknym", "pięknych", "pięknymi", "pięknych", "piękni"]
-        }
-      },
-      "biegać": {
-        type: "czasownik",
-        conjugation: {
-          present: ["ja biegam", "ty biegasz", "on/ona biega", "my biegamy", "wy biegacie", "oni/one biegają"]
-        }
-      }
-    };
+    let clients = JSON.parse(localStorage.getItem("clients")) || [];
 
-    function analyzeWord() {
-      const input = document.getElementById("wordInput").value.trim().toLowerCase();
-      const resultDiv = document.getElementById("result");
-      resultDiv.innerHTML = "";
-
-      if (!input) return;
-
-      if (words[input]) {
-        const data = words[input];
-        let html = `<div class="card"><div class="title">${input} – ${data.type}</div>`;
-
-        if (data.type === "rzeczownik" || data.type === "przymiotnik") {
-          html += "<table><tr><th>Przypadek</th><th>L. poj.</th><th>L. mn.</th></tr>";
-          const cases = ["Mianownik", "Dopełniacz", "Celownik", "Biernik", "Narzędnik", "Miejscownik", "Wołacz"];
-          for (let i = 0; i < 7; i++) {
-            html += `<tr><td>${cases[i]}</td><td>${data.cases.singular[i]}</td><td>${data.cases.plural[i]}</td></tr>`;
-          }
-          html += "</table>";
-        }
-
-        if (data.type === "czasownik") {
-          html += "<table><tr><th>Osoba</th><th>Czas teraźniejszy</th></tr>";
-          const persons = ["Ja", "Ty", "On/Ona", "My", "Wy", "Oni/One"];
-          data.conjugation.present.forEach((form, i) => {
-            html += `<tr><td>${persons[i]}</td><td>${form}</td></tr>`;
-          });
-          html += "</table>";
-        }
-
-        html += "</div>";
-        resultDiv.innerHTML = html;
-      } else {
-        resultDiv.innerHTML = `<div class="card">Nie mam jeszcze słowa <b>${input}</b> w bazie 😢</div>`;
-      }
+    function renderClients() {
+      const list = document.getElementById("clientList");
+      list.innerHTML = "";
+      clients.forEach((client, index) => {
+        list.innerHTML += `
+          <tr>
+            <td>${client.name}</td>
+            <td>${client.email}</td>
+            <td>${client.phone}</td>
+            <td>${client.status}</td>
+            <td><button class="delete" onclick="deleteClient(${index})">Usuń</button></td>
+          </tr>
+        `;
+      });
+      localStorage.setItem("clients", JSON.stringify(clients));
     }
+
+    function addClient() {
+      const name = document.getElementById("name").value;
+      const email = document.getElementById("email").value;
+      const phone = document.getElementById("phone").value;
+      const status = document.getElementById("status").value;
+
+      if (!name || !email || !phone) {
+        alert("Uzupełnij wszystkie pola!");
+        return;
+      }
+
+      clients.push({ name, email, phone, status });
+      renderClients();
+
+      document.getElementById("name").value = "";
+      document.getElementById("email").value = "";
+      document.getElementById("phone").value = "";
+    }
+
+    function deleteClient(index) {
+      clients.splice(index, 1);
+      renderClients();
+    }
+
+    renderClients();
   </script>
 </body>
 </html>
