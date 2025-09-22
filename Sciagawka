@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <title>Ściągawka - Gramatyka Polska</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f8ff;
+      color: #222;
+      text-align: center;
+      padding: 20px;
+    }
+    h1 {
+      color: #e60073;
+    }
+    input {
+      padding: 10px;
+      font-size: 16px;
+      width: 80%;
+      margin: 15px 0;
+      border: 2px solid #e60073;
+      border-radius: 8px;
+    }
+    .card {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      padding: 20px;
+      margin: 15px auto;
+      width: 90%;
+      max-width: 600px;
+      text-align: left;
+    }
+    .title {
+      font-weight: bold;
+      margin-bottom: 10px;
+      color: #0073e6;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+    td, th {
+      border: 1px solid #ddd;
+      padding: 6px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <h1>💖 Dla Nianci pięknej mojej kochanej 💖</h1>
+  <p>Wpisz słowo i sprawdź jego odmianę:</p>
+  <input type="text" id="wordInput" placeholder="np. kot, biegać, piękny" oninput="analyzeWord()">
+
+  <div id="result"></div>
+
+  <script>
+    // Prosta baza słów (na start)
+    const words = {
+      "kot": {
+        type: "rzeczownik",
+        cases: {
+          singular: ["kot", "kota", "kotu", "kota", "kotem", "kocie", "kocie"],
+          plural: ["koty", "kotów", "kotom", "koty", "kotami", "kotach", "koty"]
+        }
+      },
+      "drzewo": {
+        type: "rzeczownik",
+        cases: {
+          singular: ["drzewo", "drzewa", "drzewu", "drzewo", "drzewem", "drzewie", "drzewo"],
+          plural: ["drzewa", "drzew", "drzewom", "drzewa", "drzewami", "drzewach", "drzewa"]
+        }
+      },
+      "piękny": {
+        type: "przymiotnik",
+        cases: {
+          singular: ["piękny", "pięknego", "pięknemu", "pięknego", "pięknym", "pięknym", "piękny"],
+          plural: ["piękni", "pięknych", "pięknym", "pięknych", "pięknymi", "pięknych", "piękni"]
+        }
+      },
+      "biegać": {
+        type: "czasownik",
+        conjugation: {
+          present: ["ja biegam", "ty biegasz", "on/ona biega", "my biegamy", "wy biegacie", "oni/one biegają"]
+        }
+      }
+    };
+
+    function analyzeWord() {
+      const input = document.getElementById("wordInput").value.trim().toLowerCase();
+      const resultDiv = document.getElementById("result");
+      resultDiv.innerHTML = "";
+
+      if (!input) return;
+
+      if (words[input]) {
+        const data = words[input];
+        let html = `<div class="card"><div class="title">${input} – ${data.type}</div>`;
+
+        if (data.type === "rzeczownik" || data.type === "przymiotnik") {
+          html += "<table><tr><th>Przypadek</th><th>L. poj.</th><th>L. mn.</th></tr>";
+          const cases = ["Mianownik", "Dopełniacz", "Celownik", "Biernik", "Narzędnik", "Miejscownik", "Wołacz"];
+          for (let i = 0; i < 7; i++) {
+            html += `<tr><td>${cases[i]}</td><td>${data.cases.singular[i]}</td><td>${data.cases.plural[i]}</td></tr>`;
+          }
+          html += "</table>";
+        }
+
+        if (data.type === "czasownik") {
+          html += "<table><tr><th>Osoba</th><th>Czas teraźniejszy</th></tr>";
+          const persons = ["Ja", "Ty", "On/Ona", "My", "Wy", "Oni/One"];
+          data.conjugation.present.forEach((form, i) => {
+            html += `<tr><td>${persons[i]}</td><td>${form}</td></tr>`;
+          });
+          html += "</table>";
+        }
+
+        html += "</div>";
+        resultDiv.innerHTML = html;
+      } else {
+        resultDiv.innerHTML = `<div class="card">Nie mam jeszcze słowa <b>${input}</b> w bazie 😢</div>`;
+      }
+    }
+  </script>
+</body>
+</html>
