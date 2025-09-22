@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <title>Prosty CRM</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; background: #f7f7f7; }
+    h1 { color: #0073e6; }
+    .form, .list { background: #fff; padding: 15px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+    label { display: block; margin-top: 10px; }
+    input, select { width: 100%; padding: 8px; margin-top: 5px; border-radius: 5px; border: 1px solid #ccc; }
+    button { margin-top: 10px; padding: 10px 15px; background: #0073e6; color: white; border: none; border-radius: 5px; cursor: pointer; }
+    button:hover { background: #005bb5; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
+    th { background: #0073e6; color: white; }
+    .delete { background: red; }
+  </style>
+</head>
+<body>
+  <h1>💼 Prosty CRM</h1>
+
+  <div class="form">
+    <h2>Dodaj klienta</h2>
+    <label>Imię i nazwisko:
+      <input type="text" id="name">
+    </label>
+    <label>Email:
+      <input type="email" id="email">
+    </label>
+    <label>Telefon:
+      <input type="text" id="phone">
+    </label>
+    <label>Status:
+      <select id="status">
+        <option value="nowy">Nowy</option>
+        <option value="w trakcie">W trakcie</option>
+        <option value="współpracuje">Współpracuje</option>
+        <option value="tylko zapytał">Tylko zapytał</option>
+      </select>
+    </label>
+    <button onclick="addClient()">Dodaj klienta</button>
+  </div>
+
+  <div class="list">
+    <h2>Lista klientów</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Imię i nazwisko</th>
+          <th>Email</th>
+          <th>Telefon</th>
+          <th>Status</th>
+          <th>Akcje</th>
+        </tr>
+      </thead>
+      <tbody id="clientList"></tbody>
+    </table>
+  </div>
+
+  <script>
+    let clients = JSON.parse(localStorage.getItem("clients")) || [];
+
+    function renderClients() {
+      const list = document.getElementById("clientList");
+      list.innerHTML = "";
+      clients.forEach((client, index) => {
+        list.innerHTML += `
+          <tr>
+            <td>${client.name}</td>
+            <td>${client.email}</td>
+            <td>${client.phone}</td>
+            <td>${client.status}</td>
+            <td><button class="delete" onclick="deleteClient(${index})">Usuń</button></td>
+          </tr>
+        `;
+      });
+      localStorage.setItem("clients", JSON.stringify(clients));
+    }
+
+    function addClient() {
+      const name = document.getElementById("name").value;
+      const email = document.getElementById("email").value;
+      const phone = document.getElementById("phone").value;
+      const status = document.getElementById("status").value;
+
+      if (!name || !email || !phone) {
+        alert("Uzupełnij wszystkie pola!");
+        return;
+      }
+
+      clients.push({ name, email, phone, status });
+      renderClients();
+
+      document.getElementById("name").value = "";
+      document.getElementById("email").value = "";
+      document.getElementById("phone").value = "";
+    }
+
+    function deleteClient(index) {
+      clients.splice(index, 1);
+      renderClients();
+    }
+
+    renderClients();
+  </script>
+</body>
+</html>
